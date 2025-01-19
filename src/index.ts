@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import errorHandler from './middlewares/errorMiddleware';
 import paramedicNotificationRoute from './routes/paramedicNotificacionRoute';
+import { consumeMessages  } from './services/consumeService';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import amqp from 'amqplib'; 
@@ -42,6 +43,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/paramedic-notification', paramedicNotificationRoute);
+consumeMessages("emergencyQueue");
 
 app.use(errorHandler)
 
