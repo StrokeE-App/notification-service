@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import cookieParser from 'cookie-parser';
 import errorHandler from './middlewares/errorMiddleware';
 import paramedicNotificationRoute from './routes/paramedicNotificacionRoute';
 import { consumeMessages  } from './services/consumeService';
@@ -37,6 +38,7 @@ connectToRabbitMQ();
 connectToMongo();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get('/', (req: Request, res: Response) => {
   res.send('¡Hola, mundo con TypeScript y Express!');
