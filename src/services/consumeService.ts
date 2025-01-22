@@ -1,24 +1,33 @@
 import amqp from "amqplib";
 import { messageEmitter } from "./emiterService";
 
-export const consumeMessages = async (queueName: string) => {
+export const consumeMessages = async (queueName: string, exchangeName: string, routingKey: string) => {
   try {
     const connection = await amqp.connect(process.env.RABBIT_MQ || "amqp://localhost");
     const channel = await connection.createChannel();
+
     await channel.assertQueue(queueName, { durable: true });
 
-    console.log(`Esperando mensajes en la cola: ${queueName}`);
+    await channel.assertExchange(exchangeName, "direct", { durable: true });
+
+    await channel.bindQueue(queueName, exchangeName, routingKey);
+    console.log(`Cola "${queueName}" vinculada al exchange "${exchangeName}" con routingKey "${routingKey}"`);
 
     channel.consume(queueName, async (msg) => {
         console.log('Mensaje recibido');
       if (msg) {
-        const messageContent = JSON.parse(msg.content.toString());
-        console.log(`Mensaje recibido: ${messageContent}`);
-        const messageContonetToJson = JSON.parse(messageContent);
+        try {
+          const messageContent = msg.content.toString();
+          
+          const messageJson = JSON.parse(messageContent);
 
-        messageEmitter.emit("newMessage", messageContonetToJson);
+          messageEmitter.emit("newMessage", messageJson);
 
-        channel.ack(msg); 
+          channel.ack(msg);
+        } catch (parseError) {
+          console.error("Error al procesar el mensaje:", parseError);
+          channel.nack(msg);
+        }
       }
     });
   } catch (error) {

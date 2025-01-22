@@ -43,7 +43,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/paramedic-notification', paramedicNotificationRoute);
-consumeMessages("emergencyQueue");
+consumeMessages("paramedic_update_queue", "paramedic_exchange", "paramedic_update_queue");
 
 app.use(errorHandler)
 
