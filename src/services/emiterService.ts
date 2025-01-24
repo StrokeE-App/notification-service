@@ -2,6 +2,10 @@ import { EventEmitter } from "events";
 
 export const messageEmitter = new EventEmitter();
 
-messageEmitter.on("newMessage", (savedMessage) => {
-  console.log("Evento 'newMessage' emitido:", savedMessage);
-});
+export const handleParamedicUpdateMessage = (message: any) => {
+  messageEmitter.emit("paramedicUpdate", message);
+};
+
+export const handleEmergencyStartedMessage = (message: any) => {
+  messageEmitter.emit("emergencyStarted", message);
+};
