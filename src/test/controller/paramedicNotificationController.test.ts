@@ -146,11 +146,11 @@ describe("getEmergency Controller", () => {
 
         callback({ ambulanceId: "AMB123" });
 
-        expect(messageEmitter.on).toHaveBeenCalledWith("newMessage", expect.any(Function));
+        expect(messageEmitter.on).toHaveBeenCalledWith("emergencyStarted", expect.any(Function));
         expect(res.write).toHaveBeenCalledWith(`data: ${JSON.stringify(mockEmergency)}\n\n`);
 
         req.on("close", () => {
-            expect(messageEmitter.off).toHaveBeenCalledWith("newMessage", expect.any(Function));
+            expect(messageEmitter.off).toHaveBeenCalledWith("emergencyStarted", expect.any(Function));
         });
     });
 
