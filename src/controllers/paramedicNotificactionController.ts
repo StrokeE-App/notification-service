@@ -27,15 +27,12 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
             if (newMessageToJson.ambulanceId === ambulanceId) {
                 const updateEmergency = await getEmergencyFromDb(ambulanceId);
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
-            } else {
-                console.log('Mensaje no es para este cliente');
             }
         };
 
         messageEmitter.on("emergencyStarted", onNewMessage);
 
         req.on("close", () => {
-            console.log(`Cliente ${ambulanceId} desconectado de SSE`);
             messageEmitter.off("newMessage", onNewMessage);
         });
     } catch (error) {
