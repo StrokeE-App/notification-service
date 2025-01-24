@@ -9,3 +9,7 @@ export const handleParamedicUpdateMessage = (message: any) => {
 export const handleEmergencyStartedMessage = (message: any) => {
   messageEmitter.emit("emergencyStarted", message);
 };
+
+export const handlePatientReportMessage = (message: any) => {
+  messageEmitter.emit("patientReport", message);
+};
