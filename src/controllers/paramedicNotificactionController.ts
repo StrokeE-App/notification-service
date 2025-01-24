@@ -23,13 +23,14 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
         }
 
         const onNewMessage = async (newMessage: any) => {
-            if (newMessage.ambulanceId === ambulanceId) {
+            const newMessageToJson = JSON.parse(newMessage)
+            if (newMessageToJson.ambulanceId === ambulanceId) {
                 const updateEmergency = await getEmergencyFromDb(ambulanceId);
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
             }
         };
 
-        messageEmitter.on("newMessage", onNewMessage);
+        messageEmitter.on("emergencyStarted", onNewMessage);
 
         req.on("close", () => {
             messageEmitter.off("newMessage", onNewMessage);

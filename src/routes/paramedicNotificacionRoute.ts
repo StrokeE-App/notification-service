@@ -4,6 +4,7 @@ import { verifyTokenWithRole } from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.get("/emergencies/:ambulanceId", verifyTokenWithRole(["paramedic", "admin"]), getEmergency);
+router.get("/emergencies/:ambulanceId", getEmergency);
+
 
 export default router;
