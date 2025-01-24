@@ -1,7 +1,11 @@
 import amqp from "amqplib";
-import { messageEmitter } from "./emiterService";
 
-export const consumeMessages = async (queueName: string, exchangeName: string, routingKey: string) => {
+export const consumeMessages = async (
+  queueName: string, 
+  exchangeName: string, 
+  routingKey: string, 
+  onMessage: (message: any) => void
+) => {
   try {
     const connection = await amqp.connect(process.env.RABBIT_MQ || "amqp://localhost");
     const channel = await connection.createChannel();
@@ -14,14 +18,13 @@ export const consumeMessages = async (queueName: string, exchangeName: string, r
     console.log(`Cola "${queueName}" vinculada al exchange "${exchangeName}" con routingKey "${routingKey}"`);
 
     channel.consume(queueName, async (msg) => {
-        console.log('Mensaje recibido');
+      console.log(`Mensaje recibido de la cola "${queueName}"`);
       if (msg) {
         try {
           const messageContent = msg.content.toString();
-          
           const messageJson = JSON.parse(messageContent);
 
-          messageEmitter.emit("newMessage", messageJson);
+          onMessage(messageJson);
 
           channel.ack(msg);
         } catch (parseError) {

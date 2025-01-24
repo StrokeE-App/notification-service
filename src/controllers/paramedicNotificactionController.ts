@@ -17,14 +17,14 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
 
         const currentEmergency = await getEmergencyFromDb(ambulanceId);
         if (currentEmergency) {
-            console.log('Emergencia actual:', currentEmergency);
             res.write(`data: ${JSON.stringify(currentEmergency)}\n\n`);
         } else {
             res.write(`data: {"error": "Emergencia no encontrada"}\n\n`);
         }
 
         const onNewMessage = async (newMessage: any) => {
-            if (newMessage.ambulanceId === ambulanceId) {
+            const newMessageToJson = JSON.parse(newMessage)
+            if (newMessageToJson.ambulanceId === ambulanceId) {
                 const updateEmergency = await getEmergencyFromDb(ambulanceId);
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
             } else {
@@ -32,7 +32,7 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
             }
         };
 
-        messageEmitter.on("newMessage", onNewMessage);
+        messageEmitter.on("emergencyStarted", onNewMessage);
 
         req.on("close", () => {
             console.log(`Cliente ${ambulanceId} desconectado de SSE`);
