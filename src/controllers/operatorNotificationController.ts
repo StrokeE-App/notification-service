@@ -8,7 +8,6 @@ export const getEmergencyOperator = async (req: Request, res: Response, next: Ne
     res.setHeader("Connection", "keep-alive");
 
     try {
-
         const currentEmergency = await getEmergencyFromDbOperator();
         if (currentEmergency) {
             res.write(`data: ${JSON.stringify(currentEmergency)}\n\n`);
@@ -17,11 +16,17 @@ export const getEmergencyOperator = async (req: Request, res: Response, next: Ne
         }
 
         const onNewMessage = async () => {
+            try {
                 const updateEmergency = await getEmergencyFromDbOperator();
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
+            } catch (error) {
+                console.error("Error al procesar la nueva emergencia:", error);
+            }
         };
 
-        messageEmitter.on("patientReport", onNewMessage);
+        if (!messageEmitter.listenerCount("patientReport")) {
+            messageEmitter.on("patientReport", onNewMessage);
+        }
 
         req.on("close", () => {
             messageEmitter.off("patientReport", onNewMessage);
