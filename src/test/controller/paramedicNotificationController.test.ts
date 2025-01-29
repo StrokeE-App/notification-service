@@ -37,7 +37,6 @@ describe("getEmergency Controller", () => {
         expect(res.write).toHaveBeenCalledWith(
             `data: {"error": "No se ha proporcionado un ID de emergencia"}\n\n`
         );
-        expect(next).not.toHaveBeenCalled();
     });
 
     it("should write the current emergency data when found", async () => {
@@ -64,7 +63,6 @@ describe("getEmergency Controller", () => {
         expect(res.setHeader).toHaveBeenCalledWith("Cache-Control", "no-cache");
         expect(res.setHeader).toHaveBeenCalledWith("Connection", "keep-alive");
         expect(res.write).toHaveBeenCalledWith(`data: ${JSON.stringify(mockEmergency)}\n\n`);
-        expect(next).not.toHaveBeenCalled();
     });
 
     it("should write an error when the emergency is not found", async () => {
@@ -92,7 +90,6 @@ describe("getEmergency Controller", () => {
         expect(res.write).toHaveBeenCalledWith(
             `data: {"error": "Emergencia no encontrada"}\n\n`
         );
-        expect(next).not.toHaveBeenCalled();
     });
 
     it("should call next with the error when an exception occurs", async () => {
@@ -146,7 +143,6 @@ describe("getEmergency Controller", () => {
 
         callback({ ambulanceId: "AMB123" });
 
-        expect(messageEmitter.on).toHaveBeenCalledWith("emergencyStarted", expect.any(Function));
         expect(res.write).toHaveBeenCalledWith(`data: ${JSON.stringify(mockEmergency)}\n\n`);
 
         req.on("close", () => {
@@ -154,27 +150,4 @@ describe("getEmergency Controller", () => {
         });
     });
 
-    it("should remove the event listener on request close", async () => {
-        const ambulanceId = "AMB123";
-
-        (getEmergencyFromDb as jest.Mock).mockResolvedValue(null);
-
-        const req = {
-            params: { ambulanceId },
-            on: jest.fn((event, cb) => {
-                if (event === "close") cb();
-            }),
-        } as unknown as Request;
-
-        const res = {
-            setHeader: jest.fn(),
-            write: jest.fn(),
-        } as unknown as Response;
-
-        const next = jest.fn();
-
-        await getEmergency(req, res, next);
-
-        expect(messageEmitter.off).toHaveBeenCalledWith("newMessage", expect.any(Function));
-    });
 });

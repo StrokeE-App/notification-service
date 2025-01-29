@@ -23,17 +23,19 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
         }
 
         const onNewMessage = async (newMessage: any) => {
-            const newMessageToJson = JSON.parse(newMessage)
-            if (newMessageToJson.ambulanceId === ambulanceId) {
+            if (newMessage?.ambulanceId === ambulanceId) {
                 const updateEmergency = await getEmergencyFromDb(ambulanceId);
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
+            }else{
+                res.write(`data: {"error": "Emergencia no encontrada"}\n\n`);
             }
         };
 
-        messageEmitter.on("emergencyStarted", onNewMessage);
-
+        if (!messageEmitter.listenerCount("emergencyStarted")) {
+            messageEmitter.on("emergencyStarted", onNewMessage);
+        }
         req.on("close", () => {
-            messageEmitter.off("newMessage", onNewMessage);
+            messageEmitter.off("emergencyStarted", onNewMessage);
         });
     } catch (error) {
         next(error);
