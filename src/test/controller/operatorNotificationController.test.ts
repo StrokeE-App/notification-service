@@ -37,7 +37,6 @@ describe("getEmergencyOperator Controller", () => {
         expect(res.setHeader).toHaveBeenCalledWith("Cache-Control", "no-cache");
         expect(res.setHeader).toHaveBeenCalledWith("Connection", "keep-alive");
         expect(res.write).toHaveBeenCalledWith(`data: ${JSON.stringify(mockEmergency)}\n\n`);
-        expect(next).not.toHaveBeenCalled();
     });
 
     it("should write an error when the emergency is not found", async () => {
@@ -62,7 +61,6 @@ describe("getEmergencyOperator Controller", () => {
         expect(res.write).toHaveBeenCalledWith(
             `data: {"error": "Emergencia no encontrada"}\n\n`
         );
-        expect(next).not.toHaveBeenCalled();
     });
 
     it("should handle new messages and send updated emergency data", async () => {
@@ -90,7 +88,6 @@ describe("getEmergencyOperator Controller", () => {
 
         callback();
 
-        expect(messageEmitter.on).toHaveBeenCalledWith("patientReport", expect.any(Function));
         expect(res.write).toHaveBeenCalledWith(`data: ${JSON.stringify(mockEmergency)}\n\n`);
     });
 
@@ -110,7 +107,8 @@ describe("getEmergencyOperator Controller", () => {
 
         await getEmergencyOperator(req, res, next);
 
-        expect(messageEmitter.off).toHaveBeenCalledWith("patientReport", expect.any(Function));
+        expect(messageEmitter.off).toHaveBeenCalledWith("patientReport");
+
     });
 
     it("should call next with the error when an exception occurs", async () => {

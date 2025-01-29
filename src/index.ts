@@ -4,7 +4,7 @@ import errorHandler from './middlewares/errorMiddleware';
 import paramedicNotificationRoute from './routes/paramedicNotificacionRoute';
 import operatorNotificationRoute from './routes/operatorNotificationRoute'
 import { consumeMessages  } from './services/consumeService';
-import { handleEmergencyStartedMessage, handleParamedicUpdateMessage } from './services/emiterService';
+import { handleEmergencyStartedMessage, handleParamedicUpdateMessage, handlePatientReportMessage } from './services/emiterService';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import amqp from 'amqplib'; 
@@ -51,7 +51,7 @@ app.use('/operator-notification', operatorNotificationRoute);
 
 consumeMessages("paramedic_update_queue", "paramedic_exchange", "paramedic_update_queue", handleParamedicUpdateMessage);
 consumeMessages("emergency_started_queue", "operator_exchange", "emergency_started_queue", handleEmergencyStartedMessage);
-consumeMessages("patient_report_queue", "patient_exchange", "patient_report_queue", handleEmergencyStartedMessage);
+consumeMessages("patient_report_queue", "patient_exchange", "patient_report_queue", handlePatientReportMessage);
 
 app.use(errorHandler)
 
