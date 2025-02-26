@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import errorHandler from './middlewares/errorMiddleware';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocs from './swagger/swagger-index';
 import paramedicNotificationRoute from './routes/paramedicNotificacionRoute';
 import operatorNotificationRoute from './routes/operatorNotificationRoute'
 import { consumeMessages  } from './services/consumeService';
@@ -48,6 +50,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/paramedic-notification', paramedicNotificationRoute);
 app.use('/operator-notification', operatorNotificationRoute);
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 consumeMessages("paramedic_update_queue", "paramedic_exchange", "paramedic_update_queue", handleParamedicUpdateMessage);
 consumeMessages("emergency_started_queue", "operator_exchange", "emergency_started_queue", handleEmergencyStartedMessage);
