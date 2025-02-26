@@ -13,13 +13,13 @@ const chanels = loadSwaggerFile("realTimeChannels.yaml") as any;
 const swaggerDocs = {
   openapi: "3.0.0",
   info: {
-    title: "StrokeE back-end API",
+    title: "Notificaciones service",
     version: "1.0.0",
     description: "Documentación de la API",
   },
   servers: [
     {
-      url: "http://localhost:4000", 
+      url: "http://localhost:3003", 
     },
   ],
   paths: {
