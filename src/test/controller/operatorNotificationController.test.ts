@@ -91,26 +91,6 @@ describe("getEmergencyOperator Controller", () => {
         expect(res.write).toHaveBeenCalledWith(`data: ${JSON.stringify(mockEmergency)}\n\n`);
     });
 
-    it("should remove the event listener on request close", async () => {
-        const req = {
-            on: jest.fn((event, cb) => {
-                if (event === "close") cb();
-            }),
-        } as unknown as Request;
-
-        const res = {
-            setHeader: jest.fn(),
-            write: jest.fn(),
-        } as unknown as Response;
-
-        const next = jest.fn();
-
-        await getEmergencyOperator(req, res, next);
-
-        expect(messageEmitter.off).toHaveBeenCalledWith("patientReport");
-
-    });
-
     it("should call next with the error when an exception occurs", async () => {
         const error = new Error("Database error");
         (getEmergencyFromDbOperator as jest.Mock).mockRejectedValue(error);

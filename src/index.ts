@@ -5,15 +5,18 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerDocs from './swagger/swagger-index';
 import paramedicNotificationRoute from './routes/paramedicNotificacionRoute';
 import operatorNotificationRoute from './routes/operatorNotificationRoute'
+import clinicNotificationRoute from './routes/clinicNotificationRoute'
 import { consumeMessages  } from './services/consumeService';
 import { handleEmergencyStartedMessage, handleParamedicUpdateMessage, handlePatientReportMessage } from './services/emiterService';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import amqp from 'amqplib'; 
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
+app.use(cors());
 const PORT = process.env.PORT || 3003;
 
 const RABBITMQ_URL = process.env.RABBIT_MQ || 'amqp://localhost';
@@ -50,6 +53,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/paramedic-notification', paramedicNotificationRoute);
 app.use('/operator-notification', operatorNotificationRoute);
+app.use('/clinic-notification', clinicNotificationRoute);
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 consumeMessages("paramedic_update_queue", "paramedic_exchange", "paramedic_update_queue", handleParamedicUpdateMessage);

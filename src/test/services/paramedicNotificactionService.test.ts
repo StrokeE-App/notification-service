@@ -67,7 +67,7 @@ describe("getEmergencyFromDb", () => {
         expect(result).toEqual({ success: true, message: "No se encontraron emergencias" });
         expect(emergencyModel.aggregate).toHaveBeenCalledWith([
             {
-                $match: { ambulanceId: "", status: "ACTIVE" },
+                $match: { ambulanceId: "", status: "TO_AMBULANCE" },
             },
             expect.any(Object),
             expect.any(Object),
