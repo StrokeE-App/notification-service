@@ -45,6 +45,18 @@ paths:
                           format: date-time
                           nullable: true
                           example: null
+                        activatedBy:
+                          type: object
+                          properties:
+                            rol:
+                              type: string
+                              example: "emergencyContact"
+                            phoneNumber:
+                              type: string
+                              example: "3057479364"
+                            userId:
+                              type: string
+                              example: "fcbXc0jrHvPSiJn2fPCcwTuLOA52"
                         nihScale:
                           type: integer
                           nullable: true
@@ -152,6 +164,18 @@ paths:
                           format: date-time
                           nullable: true
                           example: null
+                        activatedBy:
+                          type: object
+                          properties:
+                            rol:
+                              type: string
+                              example: "emergencyContact"
+                            phoneNumber:
+                              type: string
+                              example: "3057479364"
+                            userId:
+                              type: string
+                              example: "fcbXc0jrHvPSiJn2fPCcwTuLOA52"                         
                         nihScale:
                           type: integer
                           nullable: true
@@ -246,6 +270,18 @@ paths:
                           format: date-time
                           nullable: true
                           example: null
+                        activatedBy:
+                          type: object
+                          properties:
+                            rol:
+                              type: string
+                              example: "emergencyContact"
+                            phoneNumber:
+                              type: string
+                              example: "3057479364"
+                            userId:
+                              type: string
+                              example: "fcbXc0jrHvPSiJn2fPCcwTuLOA52"
                         nihScale:
                           type: integer
                           nullable: true
