@@ -21,9 +21,8 @@ export const consumeMessages = async (
         if (msg) {
           try {
             console.log("Recibido mensaje:", msg.content.toString());
-            const messageContent = msg.content.toString();
-            const messageJson = JSON.parse(messageContent);
-            onMessage(messageJson);
+            const messageJson = JSON.parse(msg.content.toString());
+            await onMessage(messageJson);  // Pasamos el mensaje a la función de callback
             channel.ack(msg);
           } catch (parseError) {
             console.error("Error al procesar el mensaje:", parseError);
@@ -35,11 +34,11 @@ export const consumeMessages = async (
       // Manejo de cierre de conexión
       connection.on("close", () => {
         console.error("Conexión cerrada. Intentando reconectar...");
-        setTimeout(connectRabbitMQ, 5000); // Intentar reconectar después de 5 segundos
+        setTimeout(connectRabbitMQ, 5000);
       });
     } catch (error) {
       console.error("Error al consumir mensajes de RabbitMQ:", error);
-      setTimeout(connectRabbitMQ, 5000); // Intentar reconectar después de 5 segundos
+      setTimeout(connectRabbitMQ, 5000);
     }
   };
 
