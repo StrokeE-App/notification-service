@@ -15,6 +15,7 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
             return;
         }
 
+        // Obtener emergencia actual
         const currentEmergency = await getEmergencyFromDb(ambulanceId);
         if (currentEmergency) {
             res.write(`data: ${JSON.stringify(currentEmergency)}\n\n`);
@@ -22,21 +23,33 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
             res.write(`data: {"error": "Emergencia no encontrada"}\n\n`);
         }
 
+        // Función para manejar los eventos
         const onNewMessage = async (newMessage: any) => {
+            console.log("Nuevo mensaje recibido:", newMessage);
+
             if (newMessage?.ambulanceId === ambulanceId) {
                 const updateEmergency = await getEmergencyFromDb(ambulanceId);
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
-            }else{
-                res.write(`data: {"error": "Emergencia no encontrada"}\n\n`);
+            } else {
+                console.log("La ambulancia no coincide, ignorando el mensaje.");
             }
         };
 
-        if (!messageEmitter.listenerCount("emergencyStarted")) {
-            messageEmitter.on("emergencyStarted", onNewMessage);
-        }
-        req.on("close", () => {
-            messageEmitter.off("emergencyStarted", onNewMessage);
+        // Claves de eventos a escuchar
+        const eventKeys = [`emergencyStarted:${ambulanceId}`, `paramedicUpdate:${ambulanceId}`];
+
+        // Suscribir a eventos si no hay listeners previos
+        eventKeys.forEach(eventKey => {
+            if (!messageEmitter.listenerCount(eventKey)) {
+                messageEmitter.on(eventKey, onNewMessage);
+            }
         });
+
+        // Manejar cierre de conexión
+        req.on("close", () => {
+            eventKeys.forEach(eventKey => messageEmitter.off(eventKey, onNewMessage));
+        });
+
     } catch (error) {
         next(error);
     }
