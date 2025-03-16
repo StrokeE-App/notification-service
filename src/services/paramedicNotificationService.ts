@@ -7,7 +7,7 @@ export const getEmergencyFromDb = async (ambulanceId: string) =>{
             {
                 $match: {
                     ambulanceId: ambulanceId,
-                    status: "TO_AMBULANCE"
+                    status: {$in: ["TO_AMBULANCE", "CONFIRMED"]}
                 }
             },
             {

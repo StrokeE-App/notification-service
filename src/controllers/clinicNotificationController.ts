@@ -17,6 +17,7 @@ export const getEmergencyClinic = async (req: Request, res: Response, next: Next
 
         const onNewMessage = async () => {
             try {
+                console.log("entro al onNewMessage");
                 const updateEmergency = await getEmergencyFromDbClinic();
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
             } catch (error) {
@@ -24,12 +25,14 @@ export const getEmergencyClinic = async (req: Request, res: Response, next: Next
             }
         };
 
-        if (!messageEmitter.listenerCount("patientReport")) {
-            messageEmitter.on("patientReport", onNewMessage);
+        if (!messageEmitter.listenerCount("paramedicUpdate")) {
+            messageEmitter.on("paramedicUpdate", onNewMessage);
+        }else{
+            console.log("entro al else");
         }
 
         req.on("close", () => {
-            messageEmitter.off("patientReport", onNewMessage);
+            messageEmitter.off("paramedicUpdate", onNewMessage);
         });
     } catch (error) {
         next(error);
