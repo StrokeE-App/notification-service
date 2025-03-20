@@ -25,11 +25,18 @@ export const getEmergencyOperator = async (req: Request, res: Response, next: Ne
         };
 
         if (!messageEmitter.listenerCount("patientReport")) {
+            console.log("Nuevo mensaje recibido");
             messageEmitter.on("patientReport", onNewMessage);
+        }
+
+        if (!messageEmitter.listenerCount("dlqErrorOperator")) {
+            console.log("Error al procesar el mensaje operator");
+            messageEmitter.on("dlqErrorOperator", onNewMessage);
         }
 
         req.on("close", () => {
             messageEmitter.off("patientReport", onNewMessage);
+            messageEmitter.off("dlqErrorOperator", onNewMessage);
         });
     } catch (error) {
         next(error);

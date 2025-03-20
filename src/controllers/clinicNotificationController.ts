@@ -31,8 +31,14 @@ export const getEmergencyClinic = async (req: Request, res: Response, next: Next
             console.log("entro al else");
         }
 
+        if (!messageEmitter.listenerCount("dlqErrorParamedicUpdates")) {
+            console.log("Error al procesar la mensaje clinica");
+            messageEmitter.on("dlqErrorParamedicUpdates", onNewMessage);
+        }
+
         req.on("close", () => {
             messageEmitter.off("paramedicUpdate", onNewMessage);
+            messageEmitter.off("dlqErrorParamedicUpdates", onNewMessage);
         });
     } catch (error) {
         next(error);
