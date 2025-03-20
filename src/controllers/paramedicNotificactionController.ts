@@ -45,9 +45,16 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
             }
         });
 
+        const errorEventKey = `dlqErrorParamedic`;
+        if (!messageEmitter.listenerCount(errorEventKey)) {
+            console.log("Error al procesar la dql");
+            messageEmitter.on(errorEventKey, onNewMessage);
+        }
+
         // Manejar cierre de conexión
         req.on("close", () => {
             eventKeys.forEach(eventKey => messageEmitter.off(eventKey, onNewMessage));
+            messageEmitter.off(errorEventKey, onNewMessage);
         });
 
     } catch (error) {
