@@ -17,7 +17,8 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-const PORT = process.env.PORT || 3003;
+const envPort = process.env.NODE_ENV === 'staging' ? process.env.PORT : process.env.PORT_NOTIFICATIONS
+const PORT = envPort || 3003;
 
 const RABBITMQ_URL = process.env.RABBIT_MQ || 'amqp://localhost';
 
@@ -47,14 +48,14 @@ connectToMongo();
 app.use(express.json());
 app.use(cookieParser());
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('¡Hola, mundo con TypeScript y Express!');
+app.get('/notification/', (req: Request, res: Response) => {
+  res.send('Notification service running...');
 });
 
-app.use('/paramedic-notification', paramedicNotificationRoute);
-app.use('/operator-notification', operatorNotificationRoute);
-app.use('/clinic-notification', clinicNotificationRoute);
-app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/notification/paramedic-notification', paramedicNotificationRoute);
+app.use('/notification/operator-notification', operatorNotificationRoute);
+app.use('/notification/clinic-notification', clinicNotificationRoute);
+app.use('/notification/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 consumeMessages("paramedic_update_queue", "paramedic_exchange", "paramedic_update_queue", handleParamedicUpdateMessage);
 consumeMessages("emergency_started_queue", "operator_exchange", "emergency_started_queue", handleEmergencyStartedMessage);
