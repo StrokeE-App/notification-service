@@ -3,24 +3,15 @@ import { EventEmitter } from "events";
 export const messageEmitter = new EventEmitter();
 
 export const handleParamedicUpdateMessage = (message: any) => {
-  if (message) {
-    throw new Error("Error");
-  }
   messageEmitter.emit(`paramedicUpdate`, message);
   messageEmitter.emit(`paramedicUpdate:${message.ambulanceId}`, message);
 };
 
 export const handleEmergencyStartedMessage = (message: any) => {
-  if (message) {
-    throw new Error("Error");
-  }
   messageEmitter.emit(`emergencyStarted:${message.ambulanceId}`, message);
 };
 
 export const handlePatientReportMessage = (message: any) => {
-  if (message) {
-    throw new Error("Error");
-  }
   messageEmitter.emit("patientReport", message);
 };
 
