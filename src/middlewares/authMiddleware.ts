@@ -29,8 +29,6 @@ export const verifyTokenWithRole = (allowedRoles: string[]) => {
 
             const user = await User.findOne({ userId: userId, isDeleted: false });
 
-            console.log(user);
-
             if (!user) {
                 res.status(404).json({ message: "Usuario no encontrado." });
                 return;

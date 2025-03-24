@@ -41,7 +41,7 @@ export const consumeMessages = async (
       channel.consume(queueName, async (msg) => {
         if (msg) {
           try {
-            console.log("Recibido mensaje:", msg.content.toString());
+            console.log(`Recibido mensaje: ${msg.content.toString()} - queue: ${queueName}`);
             const messageJson = JSON.parse(msg.content.toString());
             await onMessage(messageJson);
             channel.ack(msg);
