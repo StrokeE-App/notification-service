@@ -6,7 +6,7 @@ export const getEmergencyFromDbClinic = async () =>{
         const emergencies = await emergencyModel.aggregate([
             {
                 $match: {
-                    status: "CONFIRMED"
+                    status: {$in: ["CONFIRMED", "DELIVERED"]},
                 }
             },
             {
