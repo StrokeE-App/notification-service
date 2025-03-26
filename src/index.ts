@@ -48,14 +48,14 @@ connectToMongo();
 app.use(express.json());
 app.use(cookieParser());
 
-app.get('/notification/', (req: Request, res: Response) => {
+app.get('/strokeebackend/notification/', (req: Request, res: Response) => {
   res.send('Notification service running...');
 });
 
-app.use('/notification/paramedic-notification', paramedicNotificationRoute);
-app.use('/notification/operator-notification', operatorNotificationRoute);
-app.use('/notification/clinic-notification', clinicNotificationRoute);
-app.use('/notification/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/strokeebackend/notification/paramedic-notification', paramedicNotificationRoute);
+app.use('/strokeebackend/notification/operator-notification', operatorNotificationRoute);
+app.use('/strokeebackend/notification/clinic-notification', clinicNotificationRoute);
+app.use('/strokeebackend/notification/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 consumeMessages("paramedic_update_queue", "paramedic_exchange", "paramedic_update_queue", handleParamedicUpdateMessage);
 consumeMessages("emergency_started_queue", "operator_exchange", "emergency_started_queue", handleEmergencyStartedMessage);
