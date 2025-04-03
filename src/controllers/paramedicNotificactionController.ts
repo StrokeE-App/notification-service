@@ -28,6 +28,7 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
             console.log("Nuevo mensaje recibido:", newMessage);
 
             if (newMessage?.ambulanceId === ambulanceId) {
+                console.log("La ambulancia coincide, procesando el mensaje.");
                 const updateEmergency = await getEmergencyFromDb(ambulanceId);
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
             } else {
