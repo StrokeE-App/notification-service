@@ -8,6 +8,7 @@ export const getEmergencyOperator = async (req: Request, res: Response, next: Ne
     res.setHeader("Connection", "keep-alive");
 
     try {
+        // Enviar la emergencia actual si existe
         const currentEmergency = await getEmergencyFromDbOperator();
         if (currentEmergency) {
             res.write(`data: ${JSON.stringify(currentEmergency)}\n\n`);
@@ -15,8 +16,10 @@ export const getEmergencyOperator = async (req: Request, res: Response, next: Ne
             res.write(`data: {"error": "Emergencia no encontrada"}\n\n`);
         }
 
+        // Listener por conexión
         const onNewMessage = async () => {
             try {
+                console.log("Nuevo mensaje recibido");
                 const updateEmergency = await getEmergencyFromDbOperator();
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
             } catch (error) {
@@ -24,20 +27,28 @@ export const getEmergencyOperator = async (req: Request, res: Response, next: Ne
             }
         };
 
-        if (!messageEmitter.listenerCount("patientReport")) {
-            console.log("Nuevo mensaje recibido");
-            messageEmitter.on("patientReport", onNewMessage);
-        }
+        // Eventos relevantes para operadores
+        const eventKeys = ["patientReport", "dlqErrorOperator"];
 
-        if (!messageEmitter.listenerCount("dlqErrorOperator")) {
-            console.log("Error al procesar el mensaje operator");
-            messageEmitter.on("dlqErrorOperator", onNewMessage);
-        }
-
-        req.on("close", () => {
-            messageEmitter.off("patientReport", onNewMessage);
-            messageEmitter.off("dlqErrorOperator", onNewMessage);
+        // Registrar listeners por conexión
+        eventKeys.forEach(eventKey => {
+            messageEmitter.on(eventKey, onNewMessage);
         });
+
+        // PING cada 15 segundos
+        const keepAliveInterval = setInterval(() => {
+            res.write(`: ping\n\n`);
+        }, 15000);
+
+        // Manejar desconexión
+        req.on("close", () => {
+            console.log("Cliente operador desconectado");
+            eventKeys.forEach(eventKey => {
+                messageEmitter.off(eventKey, onNewMessage);
+            });
+            clearInterval(keepAliveInterval);
+        });
+
     } catch (error) {
         next(error);
     }

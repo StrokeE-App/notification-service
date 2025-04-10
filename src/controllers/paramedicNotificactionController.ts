@@ -11,11 +11,10 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
         const ambulanceId = req.params.ambulanceId;
 
         if (!ambulanceId) {
-            res.write(`data: {"error": "No se ha proporcionado un ID de emergencia"}\n\n`);
+            res.write(`data: {"error": "No se ha proporcionado un ID de ambulancia"}\n\n`);
             return;
         }
 
-        // Obtener emergencia actual
         const currentEmergency = await getEmergencyFromDb(ambulanceId);
         if (currentEmergency) {
             res.write(`data: ${JSON.stringify(currentEmergency)}\n\n`);
@@ -23,12 +22,11 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
             res.write(`data: {"error": "Emergencia no encontrada"}\n\n`);
         }
 
-        // Función para manejar los eventos
         const onNewMessage = async (newMessage: any) => {
             console.log("Nuevo mensaje recibido:", newMessage);
 
             if (newMessage?.ambulanceId === ambulanceId) {
-                console.log("La ambulancia coincide, procesando el mensaje.");
+                console.log("La ambulancia coincide, enviando actualización al cliente.");
                 const updateEmergency = await getEmergencyFromDb(ambulanceId);
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
             } else {
@@ -36,25 +34,27 @@ export const getEmergency = async (req: Request, res: Response, next: NextFuncti
             }
         };
 
-        // Claves de eventos a escuchar
-        const eventKeys = [`emergencyStarted:${ambulanceId}`, `paramedicUpdate:${ambulanceId}`];
+        const eventKeys = [
+            `emergencyStarted:${ambulanceId}`,
+            `paramedicUpdate:${ambulanceId}`,
+            `dlqErrorParamedic`
+        ];
 
-        // Suscribir a eventos si no hay listeners previos
         eventKeys.forEach(eventKey => {
-            if (!messageEmitter.listenerCount(eventKey)) {
-                messageEmitter.on(eventKey, onNewMessage);
-            }
+            messageEmitter.on(eventKey, onNewMessage);
         });
 
-        const errorEventKey = `dlqErrorParamedic`;
-        if (!messageEmitter.listenerCount(errorEventKey)) {
-            messageEmitter.on(errorEventKey, onNewMessage);
-        }
+        const keepAliveInterval = setInterval(() => {
+            res.write(`: ping\n\n`);
+        }, 15000);
 
-        // Manejar cierre de conexión
+
         req.on("close", () => {
-            eventKeys.forEach(eventKey => messageEmitter.off(eventKey, onNewMessage));
-            messageEmitter.off(errorEventKey, onNewMessage);
+            console.log(`Cliente desconectado de ambulancia ${ambulanceId}`);
+            eventKeys.forEach(eventKey => {
+                messageEmitter.off(eventKey, onNewMessage);
+            });
+            clearInterval(keepAliveInterval);
         });
 
     } catch (error) {
