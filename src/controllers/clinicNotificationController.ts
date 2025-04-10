@@ -8,6 +8,7 @@ export const getEmergencyClinic = async (req: Request, res: Response, next: Next
     res.setHeader("Connection", "keep-alive");
 
     try {
+        // Enviar emergencia actual si existe
         const currentEmergency = await getEmergencyFromDbClinic();
         if (currentEmergency) {
             res.write(`data: ${JSON.stringify(currentEmergency)}\n\n`);
@@ -15,9 +16,10 @@ export const getEmergencyClinic = async (req: Request, res: Response, next: Next
             res.write(`data: {"error": "Emergencia no encontrada"}\n\n`);
         }
 
+        // Listener único por conexión
         const onNewMessage = async () => {
             try {
-                console.log("entro al onNewMessage");
+                console.log("Evento recibido para la clínica");
                 const updateEmergency = await getEmergencyFromDbClinic();
                 res.write(`data: ${JSON.stringify(updateEmergency)}\n\n`);
             } catch (error) {
@@ -25,21 +27,30 @@ export const getEmergencyClinic = async (req: Request, res: Response, next: Next
             }
         };
 
-        if (!messageEmitter.listenerCount("paramedicUpdate")) {
-            messageEmitter.on("paramedicUpdate", onNewMessage);
-        }else{
-            console.log("entro al else");
-        }
+        // Eventos para la clínica
+        const eventKeys = ["paramedicUpdate", "dlqErrorParamedicUpdates"];
 
-        if (!messageEmitter.listenerCount("dlqErrorParamedicUpdates")) {
-            console.log("Error al procesar la mensaje clinica");
-            messageEmitter.on("dlqErrorParamedicUpdates", onNewMessage);
-        }
-
-        req.on("close", () => {
-            messageEmitter.off("paramedicUpdate", onNewMessage);
-            messageEmitter.off("dlqErrorParamedicUpdates", onNewMessage);
+        // Suscribirse a los eventos
+        eventKeys.forEach(eventKey => {
+            messageEmitter.on(eventKey, onNewMessage);
         });
+
+
+        // PING cada 15 segundos
+        const keepAliveInterval = setInterval(() => {
+            res.write(`: ping\n\n`);
+        }, 15000);
+
+
+        // Eliminar listeners al cerrar conexión
+        req.on("close", () => {
+            console.log("Cliente clínica desconectado");
+            eventKeys.forEach(eventKey => {
+                messageEmitter.off(eventKey, onNewMessage);
+            });
+            clearInterval(keepAliveInterval);
+        });
+
     } catch (error) {
         next(error);
     }
