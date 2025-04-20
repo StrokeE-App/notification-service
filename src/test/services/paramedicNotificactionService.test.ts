@@ -67,14 +67,40 @@ describe("getEmergencyFromDb", () => {
         expect(result).toEqual({ success: true, message: "No se encontraron emergencias" });
         expect(emergencyModel.aggregate).toHaveBeenCalledWith([
             {
-                $match: { ambulanceId: "", status: "TO_AMBULANCE" },
+                $match: { 
+                    ambulanceId: "", 
+                    status: { $in: ["TO_AMBULANCE", "CONFIRMED"] } // Ajuste aquí para reflejar la consulta correcta
+                },
             },
-            expect.any(Object),
-            expect.any(Object),
-            expect.any(Object),
+            {
+                $lookup: {
+                    as: "patient",
+                    foreignField: "patientId",
+                    from: "patients",
+                    localField: "patientId",
+                },
+            },
+            { $unwind: "$patient" },
+            {
+                $project: {
+                    _id: 0,
+                    activatedBy: 1,
+                    deliveredDate: 1,
+                    emergencyId: 1,
+                    nihScale: 1,
+                    "patient.age": 1,
+                    "patient.firstName": 1,
+                    "patient.height": 1,
+                    "patient.lastName": 1,
+                    "patient.phoneNumber": 1,
+                    "patient.weight": 1,
+                    pickupDate: 1,
+                    startDate: 1,
+                    status: 1,
+                },
+            },
         ]);
-    });
-    
+    });    
     
 
 });

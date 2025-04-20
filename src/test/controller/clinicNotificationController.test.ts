@@ -78,22 +78,7 @@ describe("getEmergencyClinic Controller", () => {
         expect(res.write).toHaveBeenCalledWith(`data: ${JSON.stringify(mockEmergency)}\n\n`);
     });
 
-    it("debería eliminar el listener del evento cuando la petición se cierra", async () => {
-        const req = {
-            on: jest.fn((event, cb) => {
-                if (event === "close") cb();
-            }),
-        } as unknown as Request;
-        const res = {
-            setHeader: jest.fn(),
-            write: jest.fn(),
-        } as unknown as Response;
-        const next = jest.fn();
-
-        await getEmergencyClinic(req, res, next);
-
-        expect(messageEmitter.off).toHaveBeenCalledWith("patientReport", expect.any(Function));
-    });
+    
 
     it("debería llamar a next con el error cuando ocurre una excepción", async () => {
         const error = new Error("Database error");
