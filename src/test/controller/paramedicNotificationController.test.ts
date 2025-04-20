@@ -35,7 +35,7 @@ describe("getEmergency Controller", () => {
         expect(res.setHeader).toHaveBeenCalledWith("Cache-Control", "no-cache");
         expect(res.setHeader).toHaveBeenCalledWith("Connection", "keep-alive");
         expect(res.write).toHaveBeenCalledWith(
-            `data: {"error": "No se ha proporcionado un ID de emergencia"}\n\n`
+            `data: {"error": "No se ha proporcionado un ID de ambulancia"}\n\n`
         );
     });
 
