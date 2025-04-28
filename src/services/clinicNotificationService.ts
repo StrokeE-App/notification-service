@@ -36,7 +36,8 @@ export const getEmergencyFromDbClinic = async () =>{
                     "patient.age": 1,
                     "patient.height": 1,
                     "patient.weight": 1,
-                    "patient.phoneNumber": 1
+                    "patient.phoneNumber": 1,
+                    "patient.medications": 1,
                 }
             }
         ]);
