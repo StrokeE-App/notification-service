@@ -31,6 +31,8 @@ export const getEmergencyFromDb = async (ambulanceId: string) =>{
                     "deliveredDate": 1,
                     "activatedBy": 1,
                     "nihScale": 1,
+                    "latitude": 1,
+                    "longitude": 1,
                     "patient.firstName": 1,
                     "patient.lastName": 1,
                     "patient.age": 1,
