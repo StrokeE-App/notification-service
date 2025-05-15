@@ -1,13 +1,12 @@
 import emergencyModel from "../models/emergencyModel";
 
-export const getEmergencyFromDb = async (ambulanceId: string) =>{
+export const getEmergencyFromDbOperator = async () =>{
     try{
 
         const emergencies = await emergencyModel.aggregate([
             {
                 $match: {
-                    ambulanceId: ambulanceId,
-                    status: {$in: ["TO_AMBULANCE", "CONFIRMED"]}
+                    status: "PENDING"
                 }
             },
             {

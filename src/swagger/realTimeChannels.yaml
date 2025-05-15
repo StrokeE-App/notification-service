@@ -1,0 +1,357 @@
+paths:
+  /paramedic-notification/emergencies/{ambulanceId}:
+    get:
+      summary: Obtener información en tiempo real de una emergencia
+      description: |
+        Establece una conexión de tipo Server-Sent Events (SSE) para recibir actualizaciones en tiempo real sobre una emergencia específica.
+      parameters:
+        - name: ambulanceId
+          in: path
+          required: true
+          description: ID de la ambulancia para obtener la emergencia asociada.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Conexión establecida, los datos de la emergencia se enviarán mediante eventos SSE.
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emergencyId:
+                          type: string
+                          format: uuid
+                          example: "ae51fc04-0ab7-482a-b034-bdb04e3afb78"
+                        startDate:
+                          type: string
+                          format: date-time
+                          example: "2025-02-26T18:28:46.429Z"
+                        pickupDate:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          example: null
+                        latitude:
+                          type: number
+                          format: float
+                          example: 25.7617
+                        longitude:  
+                          type: number
+                          format: float
+                          example: -80.1918
+                        deliveredDate:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          example: null
+                        activatedBy:
+                          type: object
+                          properties:
+                            rol:
+                              type: string
+                              example: "emergencyContact"
+                            phoneNumber:
+                              type: string
+                              example: "3057479364"
+                            userId:
+                              type: string
+                              example: "fcbXc0jrHvPSiJn2fPCcwTuLOA52"
+                        status:
+                          type: string
+                          enum: [PENDING, ACTIVE, COMPLETED]
+                          example: "ACTIVE"
+                        patient:
+                          type: object
+                          properties:
+                            age:
+                              type: integer
+                              example: 24
+                            firstName:
+                              type: string
+                              example: "Carlos"
+                            lastName:
+                              type: string
+                              example: "Caceres"
+                            phoneNumber:
+                              type: string
+                              example: "3057479364"
+                            height:
+                              type: number
+                              example: 101
+                            weight:
+                              type: number
+                              example: 74.5
+        400:
+          description: No se ha proporcionado un ID de ambulancia.
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "No se ha proporcionado un ID de emergencia"
+        404:
+          description: Emergencia no encontrada.
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Emergencia no encontrada"
+        500:
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Error interno del servidor"
+  /operator-notification/emergencies-patients:
+    get:
+      summary: Obtener información en tiempo real de emergencias para operadores
+      description: |
+        Establece una conexión de tipo Server-Sent Events (SSE) para recibir actualizaciones en tiempo real sobre las emergencias activas para los operadores.
+      responses:
+        200:
+          description: Conexión establecida, los datos de la emergencia se enviarán mediante eventos SSE.
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emergencyId:
+                          type: string
+                          format: uuid
+                          example: "ae51fc04-0ab7-482a-b034-bdb04e3afb78"
+                        startDate:
+                          type: string
+                          format: date-time
+                          example: "2025-02-26T18:28:46.429Z"
+                        pickupDate:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          example: null
+                        latitude:
+                          type: number
+                          format: float
+                          example: 25.7617
+                        longitude:  
+                          type: number
+                          format: float
+                          example: -80.1918
+                        deliveredDate:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          example: null
+                        activatedBy:
+                          type: object
+                          properties:
+                            rol:
+                              type: string
+                              example: "emergencyContact"
+                            phoneNumber:
+                              type: string
+                              example: "3057479364"
+                            userId:
+                              type: string
+                              example: "fcbXc0jrHvPSiJn2fPCcwTuLOA52"                         
+                        status:
+                          type: string
+                          enum: [ACTIVE, PENDING, COMPLETED]
+                          example: "PENDING"
+                        patient:
+                          type: object
+                          properties:
+                            age:
+                              type: integer
+                              example: 24
+                            firstName:
+                              type: string
+                              example: "Carlos"
+                            lastName:
+                              type: string
+                              example: "Caceres"
+                            phoneNumber:
+                              type: string
+                              example: "3057479364"
+                            height:
+                              type: number
+                              example: 101
+                            weight:
+                              type: number
+                              example: 74.5
+        404:
+          description: No se encontró ninguna emergencia activa.
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Emergencia no encontrada"
+        500:
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Error interno del servidor"
+  /clinic-notification/emergencies:
+    get:
+      summary: Obtener emergencias confirmadas en la clínica
+      description: Retorna una lista de emergencias con información del paciente si hay emergencias confirmadas.
+      operationId: getEmergencyFromDbClinic
+      responses:
+        "200":
+          description: Lista de emergencias confirmadas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        emergencyId:
+                          type: string
+                          format: uuid
+                          example: "5580c7e3-29ba-4f9e-a0ec-5d10d9e28b0e"
+                        startDate:
+                          type: string
+                          format: date-time
+                          example: "2025-03-02T16:32:26.788Z"
+                        pickupDate:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          example: "2025-01-01T02:00:00.000Z"
+                        latitude:
+                          type: number
+                          format: float
+                          example: 25.7617
+                        longitude:  
+                          type: number
+                          format: float
+                          example: -80.1918
+                        deliveredDate:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          example: null
+                        activatedBy:
+                          type: object
+                          properties:
+                            rol:
+                              type: string
+                              example: "emergencyContact"
+                            phoneNumber:
+                              type: string
+                              example: "3057479364"
+                            userId:
+                              type: string
+                              example: "fcbXc0jrHvPSiJn2fPCcwTuLOA52"
+                        status:
+                          type: string
+                          example: "CONFIRMED"
+                        patient:
+                          type: object
+                          properties:
+                            firstName:
+                              type: string
+                              example: "Carlos"
+                            lastName:
+                              type: string
+                              example: "Caceres"
+                            conditions:
+                              type: array
+                              items:
+                                type: string
+                              example: ["gripa"]
+                            age:
+                              type: integer
+                              example: 24
+                            height:
+                              type: number
+                              format: float
+                              example: 101
+                            weight:
+                              type: number
+                              format: float
+                              example: 74.5
+                            phoneNumber:
+                              type: string
+                              example: "3057479364"
+        "404":
+          description: No se encontraron emergencias confirmadas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "No se encontraron emergencias"
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  data:
+                    type: string
+                    example: "Error obteniendo emergencia Error de conexión a la base de datos"
