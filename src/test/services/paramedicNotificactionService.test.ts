@@ -88,6 +88,8 @@ describe("getEmergencyFromDb", () => {
                     deliveredDate: 1,
                     emergencyId: 1,
                     nihScale: 1,
+                    "latitude": 1,
+                    "longitude": 1,
                     "patient.age": 1,
                     "patient.firstName": 1,
                     "patient.height": 1,
