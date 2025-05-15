@@ -18,6 +18,8 @@ describe("getEmergencyFromDbOperator", () => {
                 startDate: "2025-01-01T01:00:00Z",
                 pickupDate: "2025-01-01T01:30:00Z",
                 deliveredDate: "2025-01-01T02:00:00Z",
+                latitude: 1,
+                longitude: 1,
                 nihScale: 15,
                 patient: {
                     firstName: "Juan",
@@ -60,6 +62,8 @@ describe("getEmergencyFromDbOperator", () => {
                     "pickupDate": 1,
                     "deliveredDate": 1,
                     "activatedBy": 1,
+                    "latitude": 1,
+                    "longitude": 1,
                     "nihScale": 1,
                     "patient.firstName": 1,
                     "patient.lastName": 1,
